@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>短轮询</title>
+    <meta charset="utf-8">
+    <!--<link id="link1" rel="stylesheet" href="st.css" type="text/css" />-->
+</head>
+
+<body>
+    <div class="chose" id="checkBoxList">
+        <table id="tb" border="1" cellspacing="0" cellpadding="1">
+            <thead id="hide_tbody">
+                <th>ID</th>
+                <th>权限模块</th>
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <script src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript">
+        function submit() {
+            var time = setInterval(function () {
+                $.ajax({
+                    url: "http://localhost:8080/rightmodule/",
+                    type: "GET",
+                    async: true,
+                    cache: false,
+                    success: function (data) {
+                        // console.log(data); //打印是否有数据
+                        var html = "";
+                        for (var i = 0; i < data.result.length; i++) {
+
+                            // console.log(persons.name.length);
+                            html +=
+                                `<tr>
+                         <td>${data.result[i].rightModuleId}</td>
+                         <td>${data.result[i].moduleName}</td>
+                         <td>
+                            <button class="add">新增</button>
+                            <button class="delete">删除</button>
+                         </td>
+                         <td>
+                            <input type="checkbox" name="check" >
+                         </td>
+                      </tr>`;
+                        }
+
+                        $('#tbody').html(html);
+                    }
+                })
+            }, 1000);
+        }
+
+        window.onload = submit();
+    </script>
+</body>
+
+</html>

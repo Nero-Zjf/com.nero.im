@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>长连接</title>
+    <meta charset="utf-8">
+    <!--<link id="link1" rel="stylesheet" href="st.css" type="text/css" />-->
+</head>
+
+<body>
+    <div class="chose" id="checkBoxList">
+        <table id="tb" border="1" cellspacing="0" cellpadding="1">
+            <thead id="hide_tbody">
+                <th>ID</th>
+                <th>权限模块</th>
+                <th>排序</th>
+                <th>备注</th>
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <script src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript">
+        if (!!window.EventSource) {
+            var source = new EventSource('http://localhost:8080/rightmodule/push'); //为http://localhost:8080/testSpringMVC/push
+            s = '';
+            source.addEventListener('message', function (e) {
+                s += e.data + "<br/>"
+                $("#tbody").html(s);
+            });
+            source.addEventListener('open', function (e) {
+                console.log("连接打开.");
+            }, false);
+            source.addEventListener('error', function (e) {
+                if (e.target.readyState == EventSource.CLOSED) {
+                    console.log("连接关闭");
+                } else {
+                    console.log(e.target.readyState);
+                }
+            }, false);
+        } else {
+            alert(4);
+            console.log("没有sse");
+        }
+
+    </script>
+</body>
+
+</html>

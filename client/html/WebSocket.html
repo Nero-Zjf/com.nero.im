@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebSocket</title>
+    <meta charset="utf-8">
+    <!--<link id="link1" rel="stylesheet" href="st.css" type="text/css" />-->
+</head>
+
+<body>
+    <div class="chose" id="checkBoxList">
+        <table id="tb" border="1" cellspacing="0" cellpadding="1">
+            <thead id="hide_tbody">
+                <th>ID</th>
+                <th>权限模块</th>
+                <th>排序</th>
+                <th>备注</th>
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+        <div id="show">
+            <p id="text"></p>
+        </div>
+    </div>
+
+    <script src="../js/jquery-3.1.1.js"></script>
+    <script type="text/javascript">
+
+        function websoketTest() {
+
+            var websocket = null;
+
+            //判断当前浏览器是否支持WebSocket
+            if ('WebSocket' in window) {
+                websocket = new WebSocket("ws://localhost:8080/websocket");
+            }
+            else {
+                alert('Not support websocket')
+            }
+
+            //连接发生错误的回调方法
+            websocket.onerror = function () {
+                setMessageInnerHTML("error");
+            };
+
+            //连接成功建立的回调方法
+            websocket.onopen = function (event) {
+                setMessageInnerHTML("open");
+            }
+
+            //接收到消息的回调方法
+            websocket.onmessage = function (event) {
+                var data = new Object();
+                try {
+
+                    data = JSON.parse(event.data);
+                } catch (error) {
+                    send();
+                    return;
+                }
+                if (!data.result) return;
+                var html = '';
+                for (var i = 0; i < data.result.length; i++) {
+
+                    // console.log(persons.name.length);
+                    html +=
+                        `<tr>
+                         <td>${data.result[i].rightModuleId}</td>
+                         <td>${data.result[i].moduleName}</td>
+                         <td>
+                            <button class="add">新增</button>
+                            <button class="delete">删除</button>
+                         </td>
+                         <td>
+                            <input type="checkbox" name="check" >
+                         </td>
+                      </tr>`;
+                }
+
+                $('#tbody').html(html);
+                send();
+                // setMessageInnerHTML(event.data.result);
+            }
+
+            //连接关闭的回调方法
+            websocket.onclose = function () {
+                setMessageInnerHTML("close");
+            }
+
+            //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+            window.onbeforeunload = function () {
+                websocket.close();
+            }
+
+            //将消息显示在网页上
+            function setMessageInnerHTML(innerHTML) {
+                document.getElementById('text').innerHTML += innerHTML + '<br\>';
+            }
+
+            //关闭连接
+            function closeWebSocket() {
+                websocket.close();
+            }
+
+            //发送消息
+            function send() {
+                websocket.send('/rightModule/');
+            }
+
+            // $.ajax({
+            //     url: "http://localhost:8084/rm/rightmodule/longpolling/",
+            //     type: "GET",
+            //     timeout: 5000,
+            //     error: function (XMLHttpRequest, textStatus, errorThrown) {
+            //         if (textStatus == "timeout") { // 请求超时
+            //             longPolling(); // 递归调用
+
+            //             // 其他错误，如网络错误等
+            //         } else {
+            //             longPolling();
+            //         }
+            //     },
+            //     success: function (data) {
+            //         // console.log(data); //打印是否有数据
+            //         var html = "";
+            //         for (var i = 0; i < data.result.length; i++) {
+
+            //             // console.log(persons.name.length);
+            //             html +=
+            //                 `<tr>
+            //              <td>${data.result[i].rightModuleId}</td>
+            //              <td>${data.result[i].moduleName}</td>
+            //              <td>${data.result[i].rmOrder}</td>
+            //              <td>${data.result[i].remark}</td>
+            //              <td>
+            //                 <button class="add">新增</button>
+            //                 <button class="delete">删除</button>
+            //              </td>
+            //              <td>
+            //                 <input type="checkbox" name="check" >
+            //              </td>
+            //           </tr>`;
+            //         }
+
+            //         $('#tbody').html(html);
+
+            //         longPolling();
+            //     }
+            // });
+        }
+
+        window.onload = websoketTest();
+    </script>
+</body>
+
+</html>
